@@ -5,6 +5,7 @@ import { join } from "path";
 
 type Env = {
   BOT_TOKEN?: string;
+  SERVER_URL?: string;
 };
 
 type Options = Readonly<{
@@ -24,6 +25,7 @@ export default class Config {
   private loadEnv(sourceEnv: NodeJS.ProcessEnv): Env {
     const env: Env = {};
     env.BOT_TOKEN = sourceEnv.BOT_TOKEN;
+    env.SERVER_URL = sourceEnv.SERVER_URL;
 
     return env;
   }
@@ -32,9 +34,16 @@ export default class Config {
     if (!env.BOT_TOKEN) {
       throw new Error('BOT_TOKEN must be specified');
     }
+    if (!env.SERVER_URL) {
+      throw new Error('SERVER_URL must be specified');
+    }
   }
 
   get botToken(): string {
     return process.env.BOT_TOKEN!;
+  }
+
+  get serverUrl(): string {
+    return process.env.SERVER_URL!;
   }
 }

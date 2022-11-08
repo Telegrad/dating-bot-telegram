@@ -35,13 +35,11 @@ type OnPartnerFoundData = {
 
 type StopData = {
   chatId: number;
-}
+  closedByYou?: boolean;
+};
 
 function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
   bot.command('start', async (ctx) => {
-    // console.log(ctx);
-    console.log(ctx.update.message);
-
     await ctx.reply(BotMessages.welcomeMessage);
     await ctx.reply(BotMessages.setGenderMessage, {
       reply_markup: BotUi.genderUi
@@ -115,7 +113,7 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
   });
 
   socket.on('stop', async (data: StopData) => {
-    bot.telegram.sendMessage(data.chatId, BotMessages.stopMessage)
+    bot.telegram.sendMessage(data.chatId, data.closedByYou ? BotMessages.stopMessage : BotMessages.stopByParticipantMessage)
   });
 
   bot.command('stop', async (ctx) => {
@@ -139,7 +137,6 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
 
   bot.on('message', async (ctx) => {
     const { message } = ctx.update;
-    console.log('message', message);
 
     const messageData: SocketMessageData = {
       chatId: ctx.update.message.chat.id,

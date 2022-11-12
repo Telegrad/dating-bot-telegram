@@ -12,7 +12,8 @@
     "pm2": "5.2.2",
     "socket.io": "4.5.3",
     "socket.io-client": "4.5.3",
-    "telegraf": "4.10.0"
+    "telegraf": "4.10.0",
+    "uuid": "9.0.0"
   },
   "devDependencies": {
     "@types/node": "18.11.9",

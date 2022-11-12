@@ -45,6 +45,8 @@ type NoPrimeAccountData = {
 
 function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
   bot.command('start', async (ctx) => {
+    const referralCode = ctx.update.message?.text?.split(' ')[1]?.trim();
+
     await ctx.reply(BotMessages.welcomeMessage);
     await ctx.reply(BotMessages.setGenderMessage, {
       reply_markup: BotUi.genderUi
@@ -59,9 +61,9 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
 
     await api.saveAccount({
       fullName: ctx.update.message.from.username ?? '',
-      telegramUserId: ctx.update.message.from.id
+      telegramUserId: ctx.update.message.from.id,
+      invitedByReferralCode: referralCode ? Number(referralCode) : undefined,
     });
-
   });
 
   bot.command('search', async (ctx) => {
@@ -159,6 +161,12 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
     await ctx.reply(BotMessages.payPrimeMessage, {
       reply_markup: BotUi.payButton(config.paymentUrl, ctx.update.message.from.id)
     });
+  })
+
+  bot.command('coins', async (ctx) => {
+    const account = await api.getAccountByTelegramId(ctx.update.message.from.id);
+
+    await ctx.reply(BotMessages.coinsBalance(account.coins));
   })
 
   bot.on('message', async (ctx) => {

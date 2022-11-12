@@ -17,6 +17,7 @@ export type Account = {
   accountLVL?: AccountLVL;
   coins?: number;
   accountLVLExpiredAt?: string;
+  invitedByReferralCode?: number;
 };
 
 export default class Api {

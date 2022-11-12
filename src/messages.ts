@@ -52,3 +52,5 @@ export const genderSearchMessage = `Выберите пол по котором�
 export const notEnoughCoins = (coins: number) => `Не хватает ${coins} монет`;
 
 export const successPrimeBought = `Премиум успешно куплен`
+
+export const coinsBalance = (coins?: number) => `На счету монет ${coins || 0}`

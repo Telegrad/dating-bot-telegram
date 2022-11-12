@@ -1,12 +1,12 @@
 import { Telegraf } from 'telegraf';
-import { onGenderCallback } from './callback-handlers';
+import { onGenderCallback, onPayCallback } from './callback-handlers';
 import { Bot } from './common-types';
 import Config from './config';
-import { isGenderCallback } from './helpers';
+import { isGenderCallback, isPayCallback } from './helpers';
 import Logger from './logger';
 import * as BotMessages from "./messages";
 import * as BotUi from './ui';
-import Api from './api';
+import Api, { Gender } from './api';
 import { io, Socket } from "socket.io-client";
 
 type SocketMessageType = 'video' | 'photo' | 'text' | 'voice' | 'video_note' | 'audio' | 'document' | 'sticker';
@@ -26,6 +26,7 @@ type OnBotStartData = {
 type SearchData = {
   chatId: number;
   fromTelegramUserId: number;
+  gender?: Gender;
 };
 
 type OnPartnerFoundData = {
@@ -37,6 +38,10 @@ type StopData = {
   chatId: number;
   closedByYou?: boolean;
 };
+
+type NoPrimeAccountData = {
+  chatID: number;
+}
 
 function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
   bot.command('start', async (ctx) => {
@@ -56,6 +61,7 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
       fullName: ctx.update.message.from.username ?? '',
       telegramUserId: ctx.update.message.from.id
     });
+
   });
 
   bot.command('search', async (ctx) => {
@@ -69,8 +75,22 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
     await ctx.reply(BotMessages.searchMessage);
   });
 
+  bot.command('gendersearch', async (ctx) => {
+    const message = ctx.update.message;
+
+    await bot.telegram.sendMessage(ctx.chat.id, BotMessages.genderSearchMessage, {
+      reply_markup: BotUi.searchGenderUI
+    })
+  })
+
   socket.on('partner-found', async (data: OnPartnerFoundData) => {
     await bot.telegram.sendMessage(data.chatId, BotMessages.partnerFoundMessage);
+  })
+
+  socket.on('no-prime-account', async (data: NoPrimeAccountData) => {
+    await bot.telegram.sendMessage(data.chatID, BotMessages.noPrimeAccount, {
+      reply_markup: BotUi.buyPremium
+    })
   })
 
   socket.on('message', async (data: SocketMessageData) => {
@@ -135,6 +155,12 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
     await ctx.reply(BotMessages.searchMessage);
   });
 
+  bot.command('pay', async (ctx) => {
+    await ctx.reply(BotMessages.payPrimeMessage, {
+      reply_markup: BotUi.payButton(config.paymentUrl, ctx.update.message.from.id)
+    });
+  })
+
   bot.on('message', async (ctx) => {
     const { message } = ctx.update;
 
@@ -148,6 +174,24 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
     if ((message as any).text) {
       messageData.type = 'text';
       messageData.value = (message as any).text;
+
+      const searchData: SearchData = {
+        fromTelegramUserId: message.from.id,
+        chatId: message.chat.id,
+      };
+
+      if (String(messageData.value).toLowerCase() === 'Девушка 👩'.toLowerCase()) {
+        searchData.gender = 'girl';
+        socket.emit('search', searchData);
+        await ctx.reply(BotMessages.searchMessage);
+        return;
+      }
+      if (String(messageData.value).toLowerCase() === 'Парень 👦'.toLowerCase()) {
+        searchData.gender = 'boy';
+        socket.emit('search', searchData);
+        await ctx.reply(BotMessages.searchMessage);
+        return;
+      }
     }
     if ((message as any).photo) {
       messageData.type = 'photo';
@@ -181,12 +225,19 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
     socket.emit('message', messageData);
   })
 
-  bot.on('callback_query', async query => {
-    const queryData = query.callbackQuery.data ?? '';
+  bot.on('callback_query', async ctx => {
+    const queryData = ctx.callbackQuery.data ?? '';
 
     if (isGenderCallback(queryData)) {
-      await onGenderCallback(queryData, api, query);
-      await query.reply(BotMessages.onGenderSetMessage);
+      await onGenderCallback(queryData, api, ctx);
+      await ctx.reply(BotMessages.onGenderSetMessage);
+      await ctx.deleteMessage(ctx.callbackQuery.message?.message_id)
+      return;
+    }
+    if (isPayCallback(queryData)) {
+      const messageID = await onPayCallback(queryData, api, ctx, config);
+
+      await ctx.deleteMessage(messageID);
       return;
     }
   });

@@ -6,6 +6,7 @@ import { join } from "path";
 type Env = {
   BOT_TOKEN?: string;
   SERVER_URL?: string;
+  PAYMENT_URL?: string;
 };
 
 type Options = Readonly<{
@@ -26,6 +27,7 @@ export default class Config {
     const env: Env = {};
     env.BOT_TOKEN = sourceEnv.BOT_TOKEN;
     env.SERVER_URL = sourceEnv.SERVER_URL;
+    env.PAYMENT_URL = sourceEnv.PAYMENT_URL;
 
     return env;
   }
@@ -37,6 +39,9 @@ export default class Config {
     if (!env.SERVER_URL) {
       throw new Error('SERVER_URL must be specified');
     }
+    if (!env.PAYMENT_URL) {
+      throw new Error('PAYMENT URL must be specified');
+    }
   }
 
   get botToken(): string {
@@ -45,5 +50,9 @@ export default class Config {
 
   get serverUrl(): string {
     return process.env.SERVER_URL!;
+  }
+
+  get paymentUrl(): string {
+    return process.env.PAYMENT_URL!;
   }
 }

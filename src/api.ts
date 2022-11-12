@@ -3,11 +3,20 @@ import axios, { Axios } from 'axios';
 
 export type Gender = 'boy' | 'girl';
 
+
+export enum AccountLVL {
+  PRIME = 'prime',
+  GUEST = 'guest',
+}
+
 export type Account = {
   fullName: string;
   gender?: Gender;
   country?: string;
   telegramUserId: number;
+  accountLVL?: AccountLVL;
+  coins?: number;
+  accountLVLExpiredAt?: string;
 };
 
 export default class Api {
@@ -38,5 +47,11 @@ export default class Api {
 
   async deleteAccount(account: Account) {
     await this.api.delete(`/accounts/${account.telegramUserId}`)
+  }
+
+  async getAccountByTelegramId(id: number) {
+    const { data } = await this.api.get(`/accounts/telegram/${id}`);
+
+    return data as Account;
   }
 }

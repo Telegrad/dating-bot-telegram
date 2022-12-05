@@ -60,7 +60,7 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
     // ***************************************************
 
     await api.saveAccount({
-      fullName: ctx.update.message.from.username ?? '',
+      fullName: ctx.update.message.from.username ?? 'no name',
       telegramUserId: ctx.update.message.from.id,
       invitedByReferralCode: referralCode ? Number(referralCode) : undefined,
     });

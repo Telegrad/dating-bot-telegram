@@ -12,7 +12,7 @@ export const onGenderCallback = async (queryData: string, api: Api, query: any) 
 
   await api.updateAccount({
     telegramUserId: query.from?.id ?? 0,
-    fullName: query.from?.username ?? '',
+    fullName: query.from?.username ?? 'no name',
     gender,
   });
 }
@@ -37,7 +37,7 @@ export const onPayCallback = async (queryData: string, api: Api, ctx: Context, c
   // type === primeweeek then give prime on week
   await api.updateAccount({
     telegramUserId,
-    fullName: ctx.from?.username ?? '',
+    fullName: ctx.from?.username ?? 'no name',
     accountLVL: AccountLVL.PRIME,
     coins: Number(account.coins) - primeWeekPrice,
     accountLVLExpiredAt: moment().add('7', 'days').toString()

@@ -35,6 +35,7 @@ type OnPartnerFoundData = {
 }
 
 type StopData = {
+  telegramUserID: number;
   chatId: number;
   closedByYou?: boolean;
 };
@@ -140,13 +141,15 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
 
   bot.command('stop', async (ctx) => {
     socket.emit('stop', {
-      chatId: ctx.update.message.chat.id
+      chatId: ctx.update.message.chat.id,
+      telegramUserID: ctx.update.message.from.id
     } as StopData)
   })
 
   bot.command('next', async (ctx) => {
     socket.emit('stop', {
-      chatId: ctx.update.message.chat.id
+      chatId: ctx.update.message.chat.id,
+      telegramUserID: ctx.update.message.from.id
     } as StopData);
 
     const searchData: SearchData = {

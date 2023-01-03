@@ -15,6 +15,7 @@ type SocketMessageData = {
   chatId: number;
   fromTelegramUserId: number;
   value: string | number;
+  replyMessageId?: number;
   type: SocketMessageType;
 }
 
@@ -97,37 +98,39 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
   })
 
   socket.on('message', async (data: SocketMessageData) => {
+    const extra = data.replyMessageId ? {reply_to_message_id: Number(data.replyMessageId)} : {};
+
     try {
       if (data.type === 'photo') {
-        await bot.telegram.sendPhoto(data.chatId, data.value as string);
+        await bot.telegram.sendPhoto(data.chatId, data.value as string, extra);
         return;
       }
       if (data.type === 'text') {
-        await bot.telegram.sendMessage(data.chatId, String(data.value));
+        await bot.telegram.sendMessage(data.chatId, String(data.value), extra);
         return;
       }
       if (data.type === 'video') {
-        await bot.telegram.sendVideo(data.chatId, String(data.value));
+        await bot.telegram.sendVideo(data.chatId, String(data.value), extra);
         return;
       }
       if (data.type === 'voice') {
-        await bot.telegram.sendVoice(data.chatId, String(data.value));
+        await bot.telegram.sendVoice(data.chatId, String(data.value), extra);
         return;
       }
       if (data.type === 'video_note') {
-        await bot.telegram.sendVideoNote(data.chatId, String(data.value));
+        await bot.telegram.sendVideoNote(data.chatId, String(data.value), extra);
         return;
       }
       if (data.type === 'audio') {
-        await bot.telegram.sendAudio(data.chatId, String(data.value));
+        await bot.telegram.sendAudio(data.chatId, String(data.value), extra);
         return;
       }
       if (data.type === 'document') {
-        await bot.telegram.sendDocument(data.chatId, String(data.value));
+        await bot.telegram.sendDocument(data.chatId, String(data.value), extra);
         return;
       }
       if (data.type === 'sticker') {
-        await bot.telegram.sendSticker(data.chatId, String(data.value));
+        await bot.telegram.sendSticker(data.chatId, String(data.value), extra);
         return;
       }
     } catch (error) {
@@ -181,6 +184,10 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
       value: '',
       type: 'text'
     };
+
+    if ((message as any)?.reply_to_message?.message_id) {
+      messageData.replyMessageId = (message as any).reply_to_message.message_id;
+    }
 
     if ((message as any).text) {
       messageData.type = 'text';

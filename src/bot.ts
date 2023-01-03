@@ -186,7 +186,7 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
     };
 
     if ((message as any)?.reply_to_message?.message_id) {
-      messageData.replyMessageId = (message as any).reply_to_message.message_id;
+      messageData.replyMessageId = (message as any).reply_to_message.message_id - 1;
     }
 
     if ((message as any).text) {

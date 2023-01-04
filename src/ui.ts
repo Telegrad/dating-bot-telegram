@@ -1,3 +1,4 @@
+import { Account, AccountLVL } from "./api";
 import { UI } from "./common-types";
 
 export const genderUi: UI = {
@@ -25,6 +26,24 @@ export const payButton = (url: string, telegramUserID: number) => {
 
 export const buyPremium = {
   inline_keyboard: [
-    [{ text: "ПРЕМИУМ 7 дней 100 монет", callback_data: "pay-premiumweek" }]
+    [{ text: "ПРЕМИУМ 7 дней 50 монет", callback_data: "pay-premiumweek" }]
   ]
+}
+
+
+export const controlsUI: (account: Account | null) => UI = (account: Account | null) => {
+  const ui = {
+    resize_keyboard: true,
+    keyboard: [
+      [{ text: "🚀 Поиск любого собеседника" }],
+    ]
+  };
+
+  if (account?.accountLVL === AccountLVL.PRIME) {
+    ui.keyboard.push([{ text: "Парень 👦" }, { text: "Девушка 👩" }]);
+  }
+
+  ui.keyboard.push([{ text: "Саппорт" }]);
+
+  return ui;
 }

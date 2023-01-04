@@ -49,7 +49,13 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
   bot.command('start', async (ctx) => {
     const referralCode = ctx.update.message?.text?.split(' ')[1]?.trim();
 
-    await ctx.reply(BotMessages.welcomeMessage);
+    const account = await api.saveAccount({
+      fullName: ctx.update.message.from.username ?? 'no name',
+      telegramUserId: ctx.update.message.from.id,
+      invitedByReferralCode: referralCode ? Number(referralCode) : undefined,
+    });
+
+    await ctx.reply(BotMessages.welcomeMessage, { reply_markup: BotUi.controlsUI(account) })
     await ctx.reply(BotMessages.setGenderMessage, {
       reply_markup: BotUi.genderUi
     });
@@ -60,12 +66,6 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
     };
     socket.emit('bot-start', botStartData);
     // ***************************************************
-
-    await api.saveAccount({
-      fullName: ctx.update.message.from.username ?? 'no name',
-      telegramUserId: ctx.update.message.from.id,
-      invitedByReferralCode: referralCode ? Number(referralCode) : undefined,
-    });
   });
 
   bot.command('search', async (ctx) => {
@@ -98,7 +98,7 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
   })
 
   socket.on('message', async (data: SocketMessageData) => {
-    const extra = data.replyMessageId ? {reply_to_message_id: Number(data.replyMessageId)} : {};
+    const extra = data.replyMessageId ? { reply_to_message_id: Number(data.replyMessageId) } : {};
 
     try {
       if (data.type === 'photo') {
@@ -198,6 +198,15 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
         chatId: message.chat.id,
       };
 
+      if (String(messageData.value).toLowerCase() === '🚀 Поиск любого собеседника'.toLowerCase()) {
+        socket.emit('search', searchData);
+        await ctx.reply(BotMessages.searchMessage);
+        return;
+      }
+      if (String(messageData.value).toLowerCase() === 'Саппорт'.toLowerCase()) {
+        await ctx.reply(BotMessages.supportMessage);
+        return;
+      }
       if (String(messageData.value).toLowerCase() === 'Девушка 👩'.toLowerCase()) {
         searchData.gender = 'girl';
         socket.emit('search', searchData);

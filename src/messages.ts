@@ -10,12 +10,12 @@ export const welcomeMessage = `👋 Привет! Это Анонимный ча
 export const stopMessage = `Вы закончили связь с вашим собеседником 🙄
 Напишите /search чтобы найти следующего
 
-https://t.me/chatvdvoem_bot`;
+https://t.me/chatvdvoembot`;
 
 export const stopByParticipantMessage = `Собеседник закончил с вами чат 🙄
 Напишите /search чтобы найти следующего
 
-https://t.me/chatvdvoem_bot`;
+https://t.me/chatvdvoembot`;
 
 export const setGenderMessage = `Укажите ваш пол чтобы улучшить результаты поиска
 Вы сможете поменять пол используя /settings
@@ -23,7 +23,7 @@ export const setGenderMessage = `Укажите ваш пол чтобы улу�
 
 export const onGenderSetMessage = `Спасибо за выбор пола.`;
 
-export const partnerFoundMessage = `Партнёр найден 🐵
+export const partnerFoundMessage = `Партнёр найден ✨
 /next — Найти нового партнёра
 /stop — Прекратить общение`
 
@@ -47,7 +47,7 @@ export const payPrimeMessage = `Премиум-подписка дает воз�
 
 export const noPrimeAccount = `Чтобы искать по полу - купите ПРЕМИУМ`
 
-export const genderSearchMessage = `Выберите пол по которому искать:`
+export const genderSearchMessage = `Выберите пол по которому хотите выполнить поиск:`
 
 export const notEnoughCoins = (coins: number) => `Не хватает ${coins} монет`;
 

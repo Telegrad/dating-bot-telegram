@@ -20,7 +20,7 @@ export const onGenderCallback = async (queryData: string, api: Api, query: any) 
 export const onPayCallback = async (queryData: string, api: Api, ctx: Context, config: Config) => {
   const type = parseCallbackQueryData(queryData);
   const telegramUserId = ctx.from?.id ?? 0;
-  const primeWeekPrice = 100;
+  const primeWeekPrice = 50;
 
   const account = await api.getAccountByTelegramId(telegramUserId);
   let payPrimeMessageID;

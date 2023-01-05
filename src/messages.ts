@@ -55,4 +55,4 @@ export const successPrimeBought = `Премиум успешно куплен`
 
 export const coinsBalance = (coins?: number) => `На счету монет ${coins || 0}`
 
-export const supportMessage = 'https://t.me/ale_rez';
+export const supportMessage = 'https://t.me/anon_telega';

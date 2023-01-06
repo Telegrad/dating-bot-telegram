@@ -98,8 +98,9 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
   })
 
   socket.on('message', async (data: SocketMessageData) => {
-    const extra = data.replyMessageId ? { reply_to_message_id: Number(data.replyMessageId) } : {};
-
+    // const extra = data.replyMessageId ? { reply_to_message_id: Number(data.replyMessageId) } : {};
+    const extra = {};
+    
     try {
       if (data.type === 'photo') {
         await bot.telegram.sendPhoto(data.chatId, data.value as string, extra);
@@ -185,9 +186,9 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
       type: 'text'
     };
 
-    if ((message as any)?.reply_to_message?.message_id) {
-      messageData.replyMessageId = (message as any).reply_to_message.message_id - 1;
-    }
+    // if ((message as any)?.reply_to_message?.message_id) {
+    //   messageData.replyMessageId = (message as any).reply_to_message.message_id - 1;
+    // }
 
     if ((message as any).text) {
       messageData.type = 'text';

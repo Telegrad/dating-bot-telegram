@@ -18,6 +18,7 @@ export type Account = {
   coins?: number;
   accountLVLExpiredAt?: string;
   invitedByReferralCode?: number;
+  referralCode?: number;
 };
 
 export default class Api {
@@ -41,18 +42,40 @@ export default class Api {
   }
 
   async updateAccount(account: Account) {
-    const { data } = await this.api.put(`/accounts/telegram/${account.telegramUserId}`, account);
+    try {
+      const { data } = await this.api.put(`/accounts/telegram/${account.telegramUserId}`, account);
 
-    return data as Account;
+      return data as Account;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async deleteAccount(account: Account) {
-    await this.api.delete(`/accounts/${account.telegramUserId}`)
+    try {
+      await this.api.delete(`/accounts/${account.telegramUserId}`)
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async getAccountByTelegramId(id: number) {
-    const { data } = await this.api.get(`/accounts/telegram/${id}`);
+    try {
+      const { data } = await this.api.get(`/accounts/telegram/${id}`);
 
-    return data as Account;
+      return data as Account;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async getReferralsStatistics(userID: any) {
+    try {
+      const { data } = await this.api.get(`/accounts/referrals/${userID}`);
+
+      return data as Account;
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

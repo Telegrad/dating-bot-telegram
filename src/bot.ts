@@ -1,4 +1,4 @@
-import { Telegraf } from 'telegraf';
+import { Context, Telegraf } from 'telegraf';
 import { onGenderCallback, onPayCallback } from './callback-handlers';
 import { Bot } from './common-types';
 import Config from './config';
@@ -6,7 +6,7 @@ import { isGenderCallback, isPayCallback } from './helpers';
 import Logger from './logger';
 import * as BotMessages from "./messages";
 import * as BotUi from './ui';
-import Api, { Gender } from './api';
+import Api, { Account, Gender } from './api';
 import { io, Socket } from "socket.io-client";
 
 type SocketMessageType = 'video' | 'photo' | 'text' | 'voice' | 'video_note' | 'audio' | 'document' | 'sticker';
@@ -88,7 +88,7 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
   });
 
   bot.command('gendersearch', async (ctx) => {
-    const message = ctx.update.message;
+    // const message = ctx.update.message;
 
     try {
       await bot.telegram.sendMessage(ctx.chat.id, BotMessages.genderSearchMessage, {
@@ -101,7 +101,9 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
 
   socket.on('partner-found', async (data: OnPartnerFoundData) => {
     try {
-      await bot.telegram.sendMessage(data.chatId, BotMessages.partnerFoundMessage);
+      await bot.telegram.sendMessage(data.chatId, BotMessages.partnerFoundMessage, {
+        reply_markup: BotUi.conversationUI
+      });
     } catch (error) {
       console.error(error);
     }
@@ -120,14 +122,14 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
   socket.on('message', async (data: SocketMessageData) => {
     // const extra = data.replyMessageId ? { reply_to_message_id: Number(data.replyMessageId) } : {};
     const extra = {};
-    
+
     try {
       if (data.type === 'photo') {
         await bot.telegram.sendPhoto(data.chatId, data.value as string, extra);
         return;
       }
       if (data.type === 'text') {
-        await bot.telegram.sendMessage(data.chatId, String(data.value), extra);
+        await bot.telegram.sendMessage(data.chatId, String(data.value), { ...extra, parse_mode: "HTML" });
         return;
       }
       if (data.type === 'video') {
@@ -161,7 +163,10 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
 
   socket.on('stop', async (data: StopData) => {
     try {
-      await bot.telegram.sendMessage(data.chatId, data.closedByYou ? BotMessages.stopMessage : BotMessages.stopByParticipantMessage)
+      const account = await api.getAccountByTelegramId(data.telegramUserID);
+      await bot.telegram.sendMessage(data.chatId, data.closedByYou ? BotMessages.stopMessage : BotMessages.stopByParticipantMessage, {
+        reply_markup: BotUi.controlsUI(account as Account)
+      })
     } catch (error) {
       console.error(error);
     }
@@ -180,7 +185,7 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
         chatId: ctx.update.message.chat.id,
         telegramUserID: ctx.update.message.from.id
       } as StopData);
-  
+
       const searchData: SearchData = {
         fromTelegramUserId: ctx.update.message.from.id,
         chatId: ctx.update.message.chat.id
@@ -206,7 +211,7 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
     try {
       const account = await api.getAccountByTelegramId(ctx.update.message.from.id);
 
-      await ctx.reply(BotMessages.coinsBalance(account.coins));
+      await ctx.reply(BotMessages.coinsBalance(account?.coins));
     } catch (error) {
       console.error(error);
     }
@@ -241,8 +246,50 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
           await ctx.reply(BotMessages.searchMessage);
           return;
         }
-        if (String(messageData.value).toLowerCase() === 'Саппорт'.toLowerCase()) {
+        if (String(messageData.value).toLowerCase() === 'Баланс 💰'.toLowerCase()) {
+          const account = await api.getAccountByTelegramId(ctx.update.message.from.id);
+          await ctx.reply(BotMessages.coinsBalance(account?.coins))
+        }
+        if (String(messageData.value).toLowerCase() === 'Изменить пол 🌚'.toLowerCase()) {
+          await ctx.reply(BotMessages.setGenderMessage, { reply_markup: BotUi.genderUi });
+          return;
+        }
+        if (String(messageData.value).toLowerCase() === 'Настройки ⚙️'.toLowerCase()) {
+          await ctx.reply(BotMessages.settings, { reply_markup: BotUi.settingsUI });
+          return;
+        }
+        if (String(messageData.value).toLowerCase() === 'Пополнить баланс 💰'.toLowerCase()) {
+          const account = await api.getAccountByTelegramId(ctx.update.message.from.id);
+          await ctx.reply(BotMessages.coinsBalance(account?.coins));
+          await ctx.reply(BotMessages.payPrimeMessage, {
+            reply_markup: BotUi.payButton(config.paymentUrl, ctx.update.message.from.id)
+          })
+          return;
+        }
+        if (String(messageData.value).toLowerCase() === '💎 Купить премиум 💎'.toLowerCase()) {
+          await ctx.reply(BotMessages.buyPremium, {
+            reply_markup: BotUi.buyPremium
+          })
+          return;
+        }
+        if (String(messageData.value).toLowerCase() === 'Рефералы 💌'.toLowerCase()) {
+          const data: any = await api.getReferralsStatistics(ctx.update.message.from.id);
+          const account = await api.getAccountByTelegramId(ctx.update.message.chat.id);
+
+          await ctx.reply(BotMessages.referrals(data, (account ?? {}) as Account));
+          return;
+        }
+        if (String(messageData.value).toLowerCase() === 'Будущее обновления 🪚'.toLowerCase()) {
+          await ctx.reply(BotMessages.futureUpdates);
+          return;
+        }
+        if (String(messageData.value).toLowerCase() === 'Сапорт ❤️'.toLowerCase()) {
           await ctx.reply(BotMessages.supportMessage);
+          return;
+        }
+        if (String(messageData.value).toLowerCase() === 'Назад ↩️'.toLowerCase()) {
+          const account = await api.getAccountByTelegramId(ctx.update.message.from.id);
+          await ctx.reply(BotMessages.back, { reply_markup: BotUi.controlsUI(account as Account) });
           return;
         }
         if (String(messageData.value).toLowerCase() === 'Девушка 👩'.toLowerCase()) {
@@ -255,6 +302,41 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
           searchData.gender = 'boy';
           socket.emit('search', searchData);
           await ctx.reply(BotMessages.searchMessage);
+          return;
+        }
+        if (String(messageData.value).toLowerCase() === 'Стоп ⛔️'.toLowerCase()) {
+          socket.emit('stop', {
+            chatId: ctx.update.message.chat.id,
+            telegramUserID: ctx.update.message.from.id
+          } as StopData);
+          return;
+        }
+        if (String(messageData.value).toLowerCase() === 'Искать дальше ➡️'.toLowerCase()) {
+          try {
+            socket.emit('stop', {
+              chatId: ctx.update.message.chat.id,
+              telegramUserID: ctx.update.message.from.id
+            } as StopData);
+
+            const searchData: SearchData = {
+              fromTelegramUserId: ctx.update.message.from.id,
+              chatId: ctx.update.message.chat.id
+            };
+            socket.emit('search', searchData);
+            await ctx.reply(BotMessages.searchMessage);
+          } catch (error) {
+            console.error(error);
+          }
+          return;
+        }
+        if (String(messageData.value).toLowerCase() === 'Поделиться профилем'.toLowerCase()) {
+          const link = `<a href="tg://user?id=${messageData.fromTelegramUserId}"><b>Ссылка</b></a>`;
+
+          messageData.value = `Вот ссылка на мой телеграм-аккаунт ${link}
+
+Отправлено командой /link`;
+          socket.emit('message', messageData);
+          await ctx.replyWithHTML(`<a href="tg://user?id=${messageData.fromTelegramUserId}"><b>Ссылка</b></a> на ваш аккаунт отправлена собеседнику`);
           return;
         }
       }
@@ -289,7 +371,7 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
     } catch (error) {
       console.error(error);
     }
-    
+
     socket.emit('message', messageData);
   })
 
@@ -317,20 +399,18 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
   return bot;
 }
 
-function enableGracefulShutdown(bot: Bot) {
-  // Enable graceful stop
-  process.once('SIGINT', () => bot.stop('SIGINT'));
-  process.once('SIGTERM', () => bot.stop('SIGTERM'));
-}
-
 async function bootstrap() {
   const config = new Config();
   const bot = new Telegraf(config.botToken);
+
   const api = new Api(config);
   const socket = io(config.serverUrl);
   const preparedBot = setupBot(bot, config, api, socket);
 
-  enableGracefulShutdown(preparedBot);
+  preparedBot.catch(async (err: unknown, ctx) => {
+    console.error(err);
+    await bot.telegram.sendMessage(config.channelLogsChatID, (err as Error).message)
+  });
 
   preparedBot.launch();
 

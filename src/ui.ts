@@ -26,10 +26,10 @@ export const payButton = (url: string, telegramUserID: number) => {
 
 export const buyPremium = {
   inline_keyboard: [
-    [{ text: "ПРЕМИУМ 7 дней 50 монет", callback_data: "pay-premiumweek" }]
+    [{ text: "🥇 7 дней", callback_data: "pay-premiumweek" }],
+    [{ text: "🏆 месяц", callback_data: "pay-premiummonth" }]
   ]
 }
-
 
 export const controlsUI: (account: Account | null) => UI = (account: Account | null) => {
   const ui = {
@@ -43,7 +43,29 @@ export const controlsUI: (account: Account | null) => UI = (account: Account | n
     ui.keyboard.push([{ text: "Парень 👦" }, { text: "Девушка 👩" }]);
   }
 
-  ui.keyboard.push([{ text: "Саппорт" }]);
+  ui.keyboard.push([{ text: "Настройки ⚙️" }]);
 
   return ui;
+}
+
+export const settingsUI = {
+  resize_keyboard: true,
+  keyboard: [
+    [{ text: "Изменить пол 🌚" }],
+    [{ text: "Баланс 💰" }],
+    [{ text: "Пополнить баланс 💰" }],
+    [{ text: "💎 Купить премиум 💎" }],
+    [{ text: "Рефералы 💌" }],
+    [{ text: "Будущее обновления 🪚" }],
+    [{ text: "Сапорт ❤️" }],
+    [{ text: "Назад ↩️" }]
+  ]
+}
+
+export const conversationUI = {
+  resize_keyboard: true,
+  keyboard: [
+    [{ text: "Стоп ⛔️" }, { text: "Искать дальше ➡️" }],
+    [{ text: "Поделиться профилем" }],
+  ]
 }

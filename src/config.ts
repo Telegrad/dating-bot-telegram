@@ -7,6 +7,7 @@ type Env = {
   BOT_TOKEN?: string;
   SERVER_URL?: string;
   PAYMENT_URL?: string;
+  CHANNEL_LOGS_CHAT_ID?: string;
 };
 
 type Options = Readonly<{
@@ -28,6 +29,7 @@ export default class Config {
     env.BOT_TOKEN = sourceEnv.BOT_TOKEN;
     env.SERVER_URL = sourceEnv.SERVER_URL;
     env.PAYMENT_URL = sourceEnv.PAYMENT_URL;
+    env.CHANNEL_LOGS_CHAT_ID = sourceEnv.CHANNEL_LOGS_CHAT_ID;
 
     return env;
   }
@@ -42,6 +44,9 @@ export default class Config {
     if (!env.PAYMENT_URL) {
       throw new Error('PAYMENT URL must be specified');
     }
+    if (!env.CHANNEL_LOGS_CHAT_ID) {
+      throw new Error('CHANNEL_LOGS_CHAT_ID must be specified');
+    }
   }
 
   get botToken(): string {
@@ -54,5 +59,9 @@ export default class Config {
 
   get paymentUrl(): string {
     return process.env.PAYMENT_URL!;
+  }
+
+  get channelLogsChatID(): number {
+    return Number(process.env.CHANNEL_LOGS_CHAT_ID!);
   }
 }

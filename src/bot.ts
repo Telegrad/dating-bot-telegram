@@ -411,19 +411,25 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
 async function bootstrap() {
   const config = new Config();
   const bot = new Telegraf(config.botToken);
-
   const api = new Api(config);
-  const socket = io(config.serverUrl);
-  const preparedBot = setupBot(bot, config, api, socket);
 
-  preparedBot.catch(async (err: unknown, ctx) => {
-    console.error(err);
-    await bot.telegram.sendMessage(config.channelLogsChatID, (err as Error).message)
-  });
+  try {
 
-  preparedBot.launch();
+    const socket = io(config.serverUrl);
+    const preparedBot = setupBot(bot, config, api, socket);
 
-  Logger.log("Bot is running");
+    preparedBot.catch(async (err: unknown, ctx) => {
+      console.error(err);
+      await bot.telegram.sendMessage(config.channelLogsChatID, (err as Error).message)
+    });
+
+    preparedBot.launch();
+
+    Logger.log("Bot is running");
+  } catch (error) {
+    console.error(error);
+    await bot.telegram.sendMessage(config.channelLogsChatID, (error as Error).message)
+  }
 }
 
 bootstrap();

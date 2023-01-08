@@ -81,7 +81,9 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
         chatId: message.chat.id
       };
       socket.emit('search', searchData);
-      await ctx.reply(BotMessages.searchMessage);
+      await ctx.reply(BotMessages.searchMessage, {
+        reply_markup: BotUi.searchUI
+      });
     } catch (error) {
       console.error(error);
     }
@@ -327,6 +329,13 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
           } catch (error) {
             console.error(error);
           }
+          return;
+        }
+        if (String(messageData.value).toLowerCase() === 'Остановить поиск'.toLowerCase()) {
+          socket.emit('stop', {
+            chatId: ctx.update.message.chat.id,
+            telegramUserID: ctx.update.message.from.id
+          } as StopData);
           return;
         }
         if (String(messageData.value).toLowerCase() === 'Поделиться профилем'.toLowerCase()) {

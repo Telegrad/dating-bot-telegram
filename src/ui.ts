@@ -69,3 +69,10 @@ export const conversationUI = {
     [{ text: "Поделиться профилем" }],
   ]
 }
+
+export const searchUI = {
+  resize_keyboard: true,
+  keyboard: [
+    [{ text: "Остановить поиск" }],
+  ]
+}

@@ -49,7 +49,19 @@ export const controlsUI: (account: Account | null) => UI = (account: Account | n
 }
 
 export const settingsUI = {
-  resize_keyboard: true,
+  if (account?.accountLVL === AccountLVL.PRIME) {
+      resize_keyboard: true,
+  keyboard: [
+    [{ text: "Изменить пол 🌚" }],
+    [{ text: "Баланс 💰" }],
+    [{ text: "Пополнить баланс 💰" }],
+    [{ text: "Рефералы 💌" }],
+    [{ text: "Будущее обновления 🪚" }],
+    [{ text: "Сапорт ❤️" }],
+    [{ text: "Назад ↩️" }]
+  ]
+  } else {
+    resize_keyboard: true,
   keyboard: [
     [{ text: "Изменить пол 🌚" }],
     [{ text: "Баланс 💰" }],
@@ -60,6 +72,7 @@ export const settingsUI = {
     [{ text: "Сапорт ❤️" }],
     [{ text: "Назад ↩️" }]
   ]
+  } 
 }
 
 export const conversationUI = {

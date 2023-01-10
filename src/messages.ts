@@ -64,17 +64,17 @@ export const noPrimeAccount = `Чтобы искать по полу - купи�
 
 export const genderSearchMessage = `Выберите пол по которому хотите выполнить поиск:`
 
-export const notEnoughCoins = (coins: number) => `Не хватает ${coins} монет`;
+export const notEnoughCoins = (coins: number) => `Не хватает ${coins} 🪙 монет`;
 
-export const successPrimeBought = `Премиум успешно куплен`
+export const successPrimeBought = `Премиум успешно куплен 💎`
 
-export const coinsBalance = (coins?: number) => `На счету монет ${coins || 0}`
+export const coinsBalance = (coins?: number) => `На счету монет ${coins || 0} 🪙`
 
 export const supportMessage = 'https://t.me/anon_telega';
 export const settings = 'Настройки';
 
 export const referrals = (data: any, account: Account) => {
-  return `Приведено рефералов ${data?.referrals}
+  return `Приведено ${data?.referrals} рефералов
 
 Ссылка для привлечения рефералов
 https://t.me/chatvdvoembot?start=${account?.referralCode}

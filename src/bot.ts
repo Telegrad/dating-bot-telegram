@@ -331,17 +331,17 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
           }
           return;
         }
-        if (String(messageData.value).toLowerCase() === 'Остановить поиск'.toLowerCase()) {
+        if (String(messageData.value).toLowerCase() === 'Остановить поиск ⛔️'.toLowerCase()) {
           socket.emit('stop', {
             chatId: ctx.update.message.chat.id,
             telegramUserID: ctx.update.message.from.id
           } as StopData);
           return;
         }
-        if (String(messageData.value).toLowerCase() === 'Поделиться профилем'.toLowerCase()) {
-          const link = `<a href="tg://user?id=${messageData.fromTelegramUserId}"><b>Ссылка</b></a>`;
+        if (String(messageData.value).toLowerCase() === 'Поделиться профилем 📩'.toLowerCase()) {
+          const link = `<a href="tg://user?id=${messageData.fromTelegramUserId}"><b>Вот ссылка на мой телеграм-аккаунт</b></a>`;
 
-          messageData.value = `Вот ссылка на мой телеграм-аккаунт ${link}
+          messageData.value = `${link}
 
 Отправлено командой /link`;
           socket.emit('message', messageData);

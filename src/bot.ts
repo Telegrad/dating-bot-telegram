@@ -245,7 +245,9 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
 
         if (String(messageData.value).toLowerCase() === '🚀 Поиск любого собеседника'.toLowerCase()) {
           socket.emit('search', searchData);
-          await ctx.reply(BotMessages.searchMessage);
+          await ctx.reply(BotMessages.searchMessage, {
+             reply_markup: BotUi.searchUI
+          });      
           return;
         }
         if (String(messageData.value).toLowerCase() === 'Баланс 💰'.toLowerCase()) {
@@ -297,13 +299,17 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
         if (String(messageData.value).toLowerCase() === 'Девушка 👩'.toLowerCase()) {
           searchData.gender = 'girl';
           socket.emit('search', searchData);
-          await ctx.reply(BotMessages.searchMessage);
+          await ctx.reply(BotMessages.searchMessage, {
+             reply_markup: BotUi.searchUI
+          });      
           return;
         }
         if (String(messageData.value).toLowerCase() === 'Парень 👦'.toLowerCase()) {
           searchData.gender = 'boy';
           socket.emit('search', searchData);
-          await ctx.reply(BotMessages.searchMessage);
+          await ctx.reply(BotMessages.searchMessage, {
+             reply_markup: BotUi.searchUI
+          });          
           return;
         }
         if (String(messageData.value).toLowerCase() === 'Стоп ⛔️'.toLowerCase()) {
@@ -325,7 +331,9 @@ function setupBot(bot: Bot, config: Config, api: Api, socket: Socket) {
               chatId: ctx.update.message.chat.id
             };
             socket.emit('search', searchData);
-            await ctx.reply(BotMessages.searchMessage);
+            await ctx.reply(BotMessages.searchMessage, {
+              reply_markup: BotUi.searchUI
+            });
           } catch (error) {
             console.error(error);
           }

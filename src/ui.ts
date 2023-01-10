@@ -26,8 +26,8 @@ export const payButton = (url: string, telegramUserID: number) => {
 
 export const buyPremium = {
   inline_keyboard: [
-    [{ text: "🥇 7 дней", callback_data: "pay-premiumweek" }],
-    [{ text: "🏆 месяц", callback_data: "pay-premiummonth" }]
+    [{ text: "7 дней", callback_data: "pay-premiumweek" }],
+    [{ text: "🏆 1 месяц 🏆", callback_data: "pay-premiummonth" }]
   ]
 }
 
@@ -66,13 +66,13 @@ export const conversationUI = {
   resize_keyboard: true,
   keyboard: [
     [{ text: "Стоп ⛔️" }, { text: "Искать дальше ➡️" }],
-    [{ text: "Поделиться профилем" }],
+    [{ text: "Поделиться профилем 📩" }],
   ]
 }
 
 export const searchUI = {
   resize_keyboard: true,
   keyboard: [
-    [{ text: "Остановить поиск" }],
+    [{ text: "Остановить поиск ⛔️" }],
   ]
 }
